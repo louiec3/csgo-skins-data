@@ -13,7 +13,7 @@ cookie = {'steamLoginSecure': '76561198071584305%7C%7C3A8F0AB8B591CD5A91DA8F78E2
 
 game = 730
 weaponList = ['Pistol', 'SMG', 'Rifle', 'SniperRifle', 'Shotgun', 'Machinegun', 'Knife']
-weaponList = ['Pistol']
+weaponList = ['Pistol', 'Machinegun']
 
 for weapon in weaponList:
     print(weapon)
@@ -73,22 +73,20 @@ for weapon in weaponList:
         
         allPages.extend(allItems)
         
-        if currPos == 300:
-            print('breaking')
-            break
+        # if currPos == 300:
+        #     print('breaking')
+        #     break
             
-    
     ## remove duplicate items
     allItemNames = list(set(allItemNames))
-    print(allPages)
-    # quit()
+    # print(allPages)
+
     # Save all the name so we don't have to do this step anymore
     # use pickle to save all the names so i dont have to keep running above code
     with open(weapon + 'ItemNames.txt', 'w') as file:
         json.dump(allPages, file, ensure_ascii=True)
-    print(allPages)
-    print('test')
-    print(file)
+    # print(allPages)
+    # print('test')
     
 for weapon in weaponList:
     # open file with all names
@@ -99,4 +97,4 @@ for weapon in weaponList:
     weapon_df = pd.DataFrame(allItemNames)
     currRun = 1 # to keep track of the program running
     print(weapon_df)
-    weapon_df.to_csv('Pistols.csv')
+    weapon_df.to_csv(weapon + '.csv', index=False)
