@@ -19,6 +19,7 @@ for weapon in weaponList:
     print(weapon)
     # itialize
     allItemNames = []
+    allPages = []
     
     # find total number items
     # allItemsGet = requests.get('https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=default&sort_dir=desc&appid=' + gameID + '&norender=1&count=100', cookies=cookie); # get page
@@ -52,29 +53,40 @@ for weapon in weaponList:
     # you can only get 100 items at a time (despite putting in count= >100)
     # so we have to loop through in batches of 100 to get every single item name by specifying the start position
     # for currPos in range(0,totalItems + 100,100): # loop through all items
-    for currPos in range(0, 4): # loop through all items
+    for currPos in range(0, totalItems+100, 100):
         # time.sleep(random.uniform(0.5, 2.5)) # you cant make requests too quickly or steam gets mad
         # time.sleep(.) # you cant make requests too quickly or steam gets mad
         requestParams['start'] = currPos
+        print(currPos)
         
         # get item name of each
         weaponGet = requests.get(marketLink, requestParams, cookies=cookie)
-        print('Items ' + str(currPos)+' out of ' + str(totalItems) + ' ' + str(weaponGet.status_code)) # reassure us the code is running and we are getting good returns (code 200)
+        print('Items ' + str(currPos) + ' out of ' + str(totalItems) + ' ' + str(weaponGet.status_code)) # reassure us the code is running and we are getting good returns (code 200)
         
+
         allItems = weaponGet.content
         allItems = json.loads(allItems)
         allItems = allItems['results']
         for currItem in allItems: 
             allItemNames.append(currItem['hash_name']) # save the names
+            print(currItem['hash_name'])
+        
+        allPages.extend(allItems)
+        
+        if currPos == 300:
+            print('breaking')
+            break
+            
     
     ## remove duplicate items
     allItemNames = list(set(allItemNames))
-    
+    print(allPages)
+    # quit()
     # Save all the name so we don't have to do this step anymore
     # use pickle to save all the names so i dont have to keep running above code
     with open(weapon + 'ItemNames.txt', 'w') as file:
-        json.dump(allItems, file, ensure_ascii=True)
-    
+        json.dump(allPages, file, ensure_ascii=True)
+    print(allPages)
     print('test')
     print(file)
     
@@ -87,3 +99,4 @@ for weapon in weaponList:
     weapon_df = pd.DataFrame(allItemNames)
     currRun = 1 # to keep track of the program running
     print(weapon_df)
+    weapon_df.to_csv('Pistols.csv')
