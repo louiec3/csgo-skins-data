@@ -9,9 +9,11 @@ import random
 from datetime import datetime
 import time
 
-cookie = {'steamLoginSecure': '76561198071584305%7C%7C3A8F0AB8B591CD5A91DA8F78E21F932DAB553855'}
+# pd.options.display.max_colwidth = 100
 
-game = 730
+cookie = {'steamLoginSecure': '76561198071584305%7C%7CAF6E46BDEE06507FFA4148C70AE3CC9CB9FF47DB'}
+
+game = '730'
 weaponList = ['Pistol', 'SMG', 'Rifle', 'SniperRifle', 'Shotgun', 'Machinegun', 'Knife']
 # weaponList = ['Knife']
 
@@ -21,6 +23,7 @@ def loop_pages():
         # itialize
         allItemNames = []
         allPages = []
+        weaponsDataframes = []
         
         # find total number items
         # allItemsGet = requests.get('https://steamcommunity.com/market/search/render/?search_descriptions=0&sort_column=default&sort_dir=desc&appid=' + gameID + '&norender=1&count=100', cookies=cookie); # get page
@@ -68,7 +71,7 @@ def loop_pages():
             allItems = weaponGet.content
             allItems = json.loads(allItems)
             allItems = allItems['results']
-            for currItem in allItems: 
+            for currItem in allItems:
                 allItemNames.append(currItem['hash_name']) # save the names
                 print(currItem['hash_name'])
             
@@ -79,36 +82,35 @@ def loop_pages():
         # print(allPages)
 
         # Save all the name so we don't have to do this step anymore
-        # use pickle to save all the names so i dont have to keep running above code
-        with open(weapon + 'ItemNames.txt', 'w') as file:
+        # save all the names so i dont have to keep running above code
+        with open(weapon + 'Items.txt', 'w') as file:
             json.dump(allPages, file, ensure_ascii=True)
 
     for weapon in weaponList:
-        # open file with all names
-        with open(weapon + 'ItemNames.txt', "rb") as file:   # Unpickling
+        # add json data for each file to list to then create a dataframe
+        with open(weapon + 'Items.txt', "rb") as file:
             allItemNames = json.load(file)
-        
+            weapon_df = pd.DataFrame(allItemNames)
+            weaponsDataframes.append(weapon_df)
+
         # intialize our Panda's dataframe with the data we want from each item
-        weapon_df = pd.DataFrame(allItemNames)
-        currRun = 1 # to keep track of the program running
-        print(weapon_df)
-        weapon_df.to_csv(weapon + '.csv', index=False, encoding='utf-8-sig')
+        # weapon_df = pd.DataFrame(allItemNames)
+        # currRun = 1 # to keep track of the program running
+        # print(weapon_df)
+        # weapon_df.to_csv(weapon + '.csv', index=False, encoding='utf-8-sig')
+    allWeapons_df = pd.concat(weaponsDataframes)
+    allWeapons_df.to_csv('AllWeapons.csv', index=False, encoding='utf-8-sig')
 
 # loop_pages()
-    
 
-def price_data():
-    pd.options.display.max_colwidth = 100
-    csvList = [x + '.csv' for x in weaponList]
-    df = pd.concat(
-        map(pd.read_csv, csvList), ignore_index=True)
 
-    df.replace(to_replace={
-                'name':{'â„¢':'™'}, 
-                'hash_name':{'â„¢':'™'},
-                    })
+def clean_unicode(df):
+    # use function if UTF not working
+    # df.replace(to_replace={
+    #             'name':{'â„¢':'™'}, 
+    #             'hash_name':{'â„¢':'™'},
+    #                 })
 
-    'StatTrak™%20USP-S%20%7C%20Blood%20Tiger%20%28Factory%20New%29'
     charsDict = {
         ' ': '%20',
         '\|': '%7C',
@@ -121,11 +123,100 @@ def price_data():
         'â™¥': '♥'
     }
 
-    print(charsDict)
     df['html_name'] = df['name'].replace(charsDict, regex=True)
-    # df['html_name'] = df['name'].replace('StatTrak', 'TEST') 
+    ## use market_hash_name for the future and move function to be used after the merged dataframe is created
 
-    print(df['html_name'].iloc[1300:2000])
+    return df
+
+# clean_unicode()
+
+def expand_descriptions():
+    df = pd.read_csv('AllWeapons.csv')
+    
+    df = clean_unicode(df)
+    
+    # print(df)
+
+    df['asset_description'] = df['asset_description'].apply(eval)
+    df2 = pd.DataFrame(df['asset_description'].values.tolist(), index=df.index)
+    # print(df2)
+    df.drop(columns=['asset_description'], axis=1, inplace=True)
+    df = pd.merge(df, df2)
+    
+    print(df)
+    # print(df['html_name'].iloc[1300:2000])
+    # df.to_csv('test.csv', index=False, encoding='utf-8-sig')
+    allItems = df['name'].tolist()
+    allItemsHTML = df['html_name'].tolist()
+    priceHistoryDataframes = []
+    ## move to separate function
+    ## obtain price history and format columns
+    for currItem, htmlItem in zip(allItems[:1], allItemsHTML[:1]): # go through all item names
+        print(currItem)
+        item = requests.get('https://steamcommunity.com/market/pricehistory/?appid='+ game + '&market_hash_name=' + htmlItem, cookies=cookie) # get item data
+        # print(str(currRun),' out of ', str(len(allItemNames)) + ' code: ' + str(item.status_code))
+        # currRun += 1
+        item = item.content
+        item = json.loads(item)
+        item['name'] = currItem
+
+        temp_df = pd.DataFrame.from_dict(item)
+        # print(temp_df)
+
+        priceHistoryDataframes.append(temp_df)
+    # print(priceHistoryDataframes)
+    priceHistory_df = pd.concat(priceHistoryDataframes).reset_index(drop=True)
+    priceCol_df = pd.DataFrame(priceHistory_df['prices'].tolist(), columns=['date', 'price', 'volume'])
+
+    priceHistory_df.drop(columns=['prices'], axis=1, inplace=True)
+    priceHistory_df = pd.concat([priceHistory_df, priceCol_df], axis=1)
+    print(priceHistory_df)
+    # priceHistory_df.to_csv('allpricehistory.csv', index=False, encoding='utf-8-sig')
+    print(priceHistory_df['date'])
+    # priceHistory_df.to_csv('pricehistory.csv', index=False)
+        # break
+
+        # if item:
+        #     print(item.keys())
+        #     print(item['price_prefix'])
+        #     print(item['price_suffix'])
+        #     print(item)
+        #     itemPriceData = item['prices'] # is there price data?
+        #     if itemPriceData == False or not itemPriceData: # if there was an issue with the request then data will return false and the for loop will just continue to the next item
+        #         continue               # this could be cause the http item name was weird (eg symbol not converted to ASCII) but it will also occur if you make too many requests too fast (this is handled below)
+        #     else:
+        #         # initialize stuff
+        #         itemPrices = [] # steam returns MEDIAN price for given time bin
+        #         itemVol = []
+        #         itemDate = []
+        #         for currDay in itemPriceData: # pull out the actual data
+        #             print(currDay)
+        #             itemPrices.append(currDay[1]) # idx 1 is price
+        #             itemVol.append(currDay[2]) # idx 2 is volume of items sold
+        #             itemDate.append(datetime.strptime(currDay[0][0:11], '%b %d %Y')) # idx 0 is the date
+                
+        #         # lists are strings, convert to numbers
+        #         itemPrices = list(map(float, itemPrices))
+        #         itemVol = list(map(int, itemVol))
+        #         print(itemPrices)
+        #         print(itemVol)
+        #         print(itemDate)
 
 
-price_data()
+
+        # break
+
+
+    ## move to separate function
+
+
+
+    return df
+
+
+expand_descriptions()
+
+
+def analyze_data():
+    pass
+analyze_data()
