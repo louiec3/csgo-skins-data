@@ -130,19 +130,55 @@ def clean_unicode(df):
 
 # clean_unicode()
 
+
 def expand_descriptions():
     df = pd.read_csv('AllWeapons.csv')
     
     df = clean_unicode(df)
     
     # print(df)
-
+ 
     df['asset_description'] = df['asset_description'].apply(eval)
     df2 = pd.DataFrame(df['asset_description'].values.tolist(), index=df.index)
-    # print(df2)
     df.drop(columns=['asset_description'], axis=1, inplace=True)
     df = pd.merge(df, df2)
+
+    # df['weapon_name'] = df['name'].str.replace('Souvenir ', '').astype(int) 
+    ## applys may not be needed here... **
+    df['weapon'] = (df['name'].apply(lambda row: row.rsplit(' |', 1)[0])
+                    .apply(lambda row: row.rsplit(' ', 0)[0])
+                    .replace({'Souvenir ': '', 'StatTrak™ ': '', '★ ': ''}, regex=True)
+                    )
+    df['skin'] = df['name'].str.extract(r'(?<=\|\s)(.*?)(?=\s\()')
+    df['condition'] = df['name'].str.extract(r'(?<=\()(.*?)(?=\))')
+    df['weapon_type'] = df['type'].apply(lambda row: row.rsplit(' ', 1)[1])
+    df['quality'] = df['type'].apply(lambda row: row.rsplit(' ', 1)[0])
+    df['quality'] = df['type'].apply(lambda row: row.rsplit(' ', 1)[0])
+
+    simplified_df = df[['name', 'html_name', 'weapon', 'skin', 'condition', 'weapon_type', 'quality', 'name_color', 'sell_listings', 'sell_price', 'sell_price_text']]
+    print(simplified_df)
+    # print(df)
+    print(simplified_df['weapon'])
+    print(simplified_df['skin'])
+    print(simplified_df['condition'])
+    # print(simplified_df['weapon_type'])
     
+    # simplified_df.to_csv('AllWeapons3.csv', index=False, encoding='utf-8-sig')
+    return df
+
+expand_descriptions()
+
+
+def weapon_stats(df):
+    print(df.columns)
+    print(df.head(2))
+    weaponSkinDistribution_df = df.groupby(['weapon_type'])['weapon_type'].count()
+    print(weaponSkinDistribution_df)
+
+# weapon_stats(expand_descriptions())
+
+
+def get_market_data(df):
     print(df)
     # print(df['html_name'].iloc[1300:2000])
     # df.to_csv('test.csv', index=False, encoding='utf-8-sig')
@@ -170,9 +206,14 @@ def expand_descriptions():
 
     priceHistory_df.drop(columns=['prices'], axis=1, inplace=True)
     priceHistory_df = pd.concat([priceHistory_df, priceCol_df], axis=1)
+    priceHistory_df['date'] = priceHistory_df['date'].str[:14].astype('datetime64[ns]')
+    priceHistory_df['price'] = priceHistory_df['price'].astype(float)
+    priceHistory_df['volume'] = priceHistory_df['volume'].astype(int) ## potentially use df.to_numeric (test the speed difference)
     print(priceHistory_df)
     # priceHistory_df.to_csv('allpricehistory.csv', index=False, encoding='utf-8-sig')
-    print(priceHistory_df['date'])
+    print(priceHistory_df['date'].dtypes)
+    print(priceHistory_df['price'].dtypes)
+    print(priceHistory_df['volume'].dtypes)
     # priceHistory_df.to_csv('pricehistory.csv', index=False)
         # break
 
@@ -209,14 +250,10 @@ def expand_descriptions():
 
     ## move to separate function
 
-
-
-    return df
-
-
-expand_descriptions()
+# get_market_data(expand_descriptions())
 
 
 def analyze_data():
     pass
-analyze_data()
+    print('test')
+# analyze_data()
