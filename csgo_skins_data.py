@@ -152,15 +152,19 @@ def expand_descriptions():
     df['skin'] = df['name'].str.extract(r'(?<=\|\s)(.*?)(?=\s\()')
     df['condition'] = df['name'].str.extract(r'(?<=\()(.*?)(?=\))')
     df['weapon_type'] = df['type'].apply(lambda row: row.rsplit(' ', 1)[1])
-    df['quality'] = df['type'].apply(lambda row: row.rsplit(' ', 1)[0])
-    df['quality'] = df['type'].apply(lambda row: row.rsplit(' ', 1)[0])
+    df['quality'] = (df['type'].apply(lambda row: row.rsplit(' ', 1)[0])
+                    .replace({'Souvenir ': '', 'StatTrak™ ': '', '★ ': ''}, regex=True)
+                    )
+    ## this lambda can probably be simplified... **
+    df['category'] = df['name'].apply(lambda x: '★ StatTrak™' if '★' in x and 'StatTrak' in x else 'StatTrak™' if 'StatTrak' in x else '★' if '★' in x else 'Souvenir' if 'Souvenir' in x else 'Normal')
 
-    simplified_df = df[['name', 'html_name', 'weapon', 'skin', 'condition', 'weapon_type', 'quality', 'name_color', 'sell_listings', 'sell_price', 'sell_price_text']]
+    simplified_df = df[['name', 'html_name', 'weapon', 'skin', 'condition', 'weapon_type', 'quality', 'category', 'name_color', 'sell_listings', 'sell_price', 'sell_price_text']]
     print(simplified_df)
     # print(df)
     print(simplified_df['weapon'])
     print(simplified_df['skin'])
     print(simplified_df['condition'])
+    print(simplified_df['category'])
     # print(simplified_df['weapon_type'])
     
     # simplified_df.to_csv('AllWeapons3.csv', index=False, encoding='utf-8-sig')
