@@ -212,22 +212,18 @@ def get_market_data():
     df = pd.read_csv('AllWeapons3.csv')
     
     print(df)
-    # print(df['html_name'].iloc[1300:2000])
-    # df.to_csv('test.csv', index=False, encoding='utf-8-sig')
     allItems = df['name'].tolist()
     allItemsHTML = df['html_name'].tolist()
     priceHistoryDataframes = []
     ## move to separate function
     ## obtain price history and format columns
     i = 0
-    # print(allItems[0])
-    # print(allItems[1])
-    # print(allItems[2])
     # quit()
     items_zip = zip(allItems[800:900], allItemsHTML[800:900])
     # items_zip = zip(allItems, allItemsHTML)
     print(f'Items to fetch: {len(allItems)}')
     print(f'Items to fetch: {len(allItemsHTML)}')
+
     for currItem, htmlItem in items_zip: # go through all item names
         i += 1
         print(currItem)
@@ -242,11 +238,16 @@ def get_market_data():
 
         priceHistoryDataframes.append(temp_df)
         print(i)
+        
     # print(priceHistoryDataframes)
     priceHistory_df = pd.concat(priceHistoryDataframes).reset_index(drop=True)
     priceCol_df = pd.DataFrame(priceHistory_df['prices'].tolist(), columns=['date', 'price', 'volume'])
     priceHistory_df.drop(columns=['prices'], axis=1, inplace=True)
     priceHistory_df = pd.concat([priceHistory_df, priceCol_df], axis=1)
+
+    ## remove later **
+    # priceHistory_df = pd.read_csv('pricehistory_100Skins.csv')
+
     priceHistory_df['date'] = priceHistory_df['date'].str[:14].astype('datetime64[ns]')
     priceHistory_df['price'] = priceHistory_df['price'].astype(float)
     priceHistory_df['volume'] = priceHistory_df['volume'].astype(int) ## potentially use df.to_numeric (test the speed difference)
@@ -255,15 +256,12 @@ def get_market_data():
     print(priceHistory_df['date'].dtypes)
     print(priceHistory_df['price'].dtypes)
     print(priceHistory_df['volume'].dtypes)
-    priceHistory_df.to_csv('pricehistory.csv', index=False)
-    volumePivot_df = priceHistory_df.pivot(index='name', columns='date', values='volume')
-    pricePivot_df = priceHistory_df.pivot(index='name', columns='date', values='price')
-    print(volumePivot_df)
-    print(pricePivot_df)
+    # priceHistory_df.to_csv('pricehistory.csv', index=False)
+
     ## once all data is collected and merged, index will be, weapon_type, weapon, skin
     ## later, we can use the category/condition/quality as the index... or group everything together in 1 table?
 
-
+        ## extra and unnecessary code from the original repo
         # break
 
         # if item:
@@ -295,15 +293,35 @@ def get_market_data():
 
 
         # break
+    return priceHistory_df
 
-
-    ## move to separate function
-
-get_market_data()
+# get_market_data()
 # get_market_data(expand_descriptions())
 
 
-def analyze_data():
-    pass
-    print('test')
-# analyze_data()
+def reformat_market_table():
+    ## sort_values and sort_index did not sort date column correctly. Resorted to list.sort()
+    priceHistory_df = pd.read_csv('pricehistory.csv')
+    # priceHistory_df['date'] = pd.to_datetime(priceHistory_df['date']).drop_duplicates(keep='last').dropna()
+    reformat = priceHistory_df['date'].astype('datetime64[ns]').drop_duplicates(keep='last')
+
+    test_list = list(set(reformat.tolist()))
+    test_list.sort()
+    test1 = pd.DataFrame(test_list, columns=['date'])
+    # test1 = priceHistory_df['date'].drop_duplicates(keep='last').sort_index(ascending=True) #.reset_index(drop=True)
+    # test1 = priceHistory_df['date'].drop_duplicates(keep='last').sort_values() #.reset_index(drop=True)
+    # print(test1.dtypes)
+    # print(test_list)
+    print(test1)
+    test1.to_csv('ordereddates.csv', index=False)
+
+    # pivottest_df = priceHistory_df.pivot_table(values='volume', index='date', columns=['weapon', 'skin'])
+    # print(pivottest_df)
+    quit()
+
+    volumePivot_df = priceHistory_df.pivot(index=['weapon', 'skin'], columns='date', values='volume')
+    pricePivot_df = priceHistory_df.pivot(index=['weapon', 'skin'], columns='date', values='price')
+    print(volumePivot_df)
+    print(pricePivot_df)
+    
+reformat_market_table()
