@@ -119,7 +119,9 @@ def clean_unicode(df):
         'é¾çŽ‹': '龍王',
         'Ã¶': 'ö',
         'â˜…': '★',
-        'â™¥': '♥'
+        'â™¥': '♥',
+        '&': '%26',
+        '!': '%21'
     }
 
     df['html_name'] = df['name'].replace(charsDict, regex=True)
@@ -169,8 +171,8 @@ def expand_descriptions():
     # simplified_df.to_csv('AllWeapons3.csv', index=False, encoding='utf-8-sig')
     return df
 
-expand_descriptions()
-
+# expand_descriptions()
+# quit()
 
 def weapon_stats():
     df = pd.read_csv('AllWeapons3.csv')
@@ -217,7 +219,17 @@ def get_market_data():
     priceHistoryDataframes = []
     ## move to separate function
     ## obtain price history and format columns
-    for currItem, htmlItem in zip(allItems[:1], allItemsHTML[:1]): # go through all item names
+    i = 0
+    # print(allItems[0])
+    # print(allItems[1])
+    # print(allItems[2])
+    # quit()
+    items_zip = zip(allItems[800:900], allItemsHTML[800:900])
+    # items_zip = zip(allItems, allItemsHTML)
+    print(f'Items to fetch: {len(allItems)}')
+    print(f'Items to fetch: {len(allItemsHTML)}')
+    for currItem, htmlItem in items_zip: # go through all item names
+        i += 1
         print(currItem)
         item = requests.get('https://steamcommunity.com/market/pricehistory/?appid=' + game + '&market_hash_name=' + htmlItem, cookies=cookie) # get item data
         # print(str(currRun),' out of ', str(len(allItemNames)) + ' code: ' + str(item.status_code))
@@ -225,15 +237,14 @@ def get_market_data():
         item = item.content
         item = json.loads(item)
         item['name'] = currItem
-
         temp_df = pd.DataFrame.from_dict(item)
         # print(temp_df)
 
         priceHistoryDataframes.append(temp_df)
+        print(i)
     # print(priceHistoryDataframes)
     priceHistory_df = pd.concat(priceHistoryDataframes).reset_index(drop=True)
     priceCol_df = pd.DataFrame(priceHistory_df['prices'].tolist(), columns=['date', 'price', 'volume'])
-
     priceHistory_df.drop(columns=['prices'], axis=1, inplace=True)
     priceHistory_df = pd.concat([priceHistory_df, priceCol_df], axis=1)
     priceHistory_df['date'] = priceHistory_df['date'].str[:14].astype('datetime64[ns]')
@@ -244,7 +255,7 @@ def get_market_data():
     print(priceHistory_df['date'].dtypes)
     print(priceHistory_df['price'].dtypes)
     print(priceHistory_df['volume'].dtypes)
-    # priceHistory_df.to_csv('pricehistory.csv', index=False)
+    priceHistory_df.to_csv('pricehistory.csv', index=False)
     volumePivot_df = priceHistory_df.pivot(index='name', columns='date', values='volume')
     pricePivot_df = priceHistory_df.pivot(index='name', columns='date', values='price')
     print(volumePivot_df)
