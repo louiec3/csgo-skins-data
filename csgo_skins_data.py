@@ -1,17 +1,16 @@
 import requests
 import json
-import pickle
 
 import pandas as pd
 import numpy as np
-import random
+import matplotlib.pyplot as plt
 
 from datetime import datetime
 import time
 
 # pd.options.display.max_colwidth = 100
 
-cookie = {'steamLoginSecure': '76561198071584305%7C%7CAF6E46BDEE06507FFA4148C70AE3CC9CB9FF47DB'}
+cookie = {'steamLoginSecure': '76561198071584305%7C%7C237112000D5109ECFD7F0232771C5E3E448D4BB3'}
 
 game = '730'
 weaponList = ['Pistol', 'SMG', 'Rifle', 'SniperRifle', 'Shotgun', 'Machinegun', 'Knife']
@@ -133,7 +132,7 @@ def clean_unicode(df):
 
 def expand_descriptions():
     df = pd.read_csv('AllWeapons.csv')
-    
+
     df = clean_unicode(df)
     
     # print(df)
@@ -173,16 +172,43 @@ def expand_descriptions():
 expand_descriptions()
 
 
-def weapon_stats(df):
+def weapon_stats():
+    df = pd.read_csv('AllWeapons3.csv')
+
     print(df.columns)
     print(df.head(2))
-    weaponSkinDistribution_df = df.groupby(['weapon_type'])['weapon_type'].count()
-    print(weaponSkinDistribution_df)
+    countPerWeaponType = df.groupby(['weapon_type'])['weapon_type'].count().reset_index(name='count').reset_index(drop=True)
+    VolPerWeaponType_df = df.groupby(['weapon_type'])['sell_listings'].sum().reset_index(name='total_volume').reset_index(drop=True)
+    volPerWeaponTypeQuality_df = df.groupby(['weapon_type', 'quality'])['sell_listings'].sum().reset_index(name='total_volume').sort_values('total_volume').reset_index(drop=True)
+    print(countPerWeaponType)
+    print(VolPerWeaponType_df)
+    print(volPerWeaponTypeQuality_df)
+    # weaponSkinDistribution_df.plot(x='weapon_type', y='count', kind='bar')
+    # plt.show()
 
+    # Create a pieplot
+    # plt.pie(x=weaponSkinDistribution_df['count'], labels=weaponSkinDistribution_df['weapon_type'])
+    # plt.pie(x=weaponVolumeDistribution_df['total_volume'], labels=weaponVolumeDistribution_df['weapon_type'])
+    
+    # plt.bar(weaponVolumeDistribution_df['weapon_type'], weaponVolumeDistribution_df['total_volume'])
+    # plt.ticklabel_format(style='plain', axis="y")
+
+
+    # add a circle at the center to transform it in a donut chart
+    # my_circle=plt.Circle( (0,0), 0.7, color='white')
+    # p=plt.gcf()
+    # p.gca().add_artist(my_circle)
+
+    # plt.show()
+
+
+# weapon_stats()
 # weapon_stats(expand_descriptions())
 
 
-def get_market_data(df):
+def get_market_data():
+    df = pd.read_csv('AllWeapons3.csv')
+    
     print(df)
     # print(df['html_name'].iloc[1300:2000])
     # df.to_csv('test.csv', index=False, encoding='utf-8-sig')
@@ -193,7 +219,7 @@ def get_market_data(df):
     ## obtain price history and format columns
     for currItem, htmlItem in zip(allItems[:1], allItemsHTML[:1]): # go through all item names
         print(currItem)
-        item = requests.get('https://steamcommunity.com/market/pricehistory/?appid='+ game + '&market_hash_name=' + htmlItem, cookies=cookie) # get item data
+        item = requests.get('https://steamcommunity.com/market/pricehistory/?appid=' + game + '&market_hash_name=' + htmlItem, cookies=cookie) # get item data
         # print(str(currRun),' out of ', str(len(allItemNames)) + ' code: ' + str(item.status_code))
         # currRun += 1
         item = item.content
@@ -219,6 +245,14 @@ def get_market_data(df):
     print(priceHistory_df['price'].dtypes)
     print(priceHistory_df['volume'].dtypes)
     # priceHistory_df.to_csv('pricehistory.csv', index=False)
+    volumePivot_df = priceHistory_df.pivot(index='name', columns='date', values='volume')
+    pricePivot_df = priceHistory_df.pivot(index='name', columns='date', values='price')
+    print(volumePivot_df)
+    print(pricePivot_df)
+    ## once all data is collected and merged, index will be, weapon_type, weapon, skin
+    ## later, we can use the category/condition/quality as the index... or group everything together in 1 table?
+
+
         # break
 
         # if item:
@@ -254,6 +288,7 @@ def get_market_data(df):
 
     ## move to separate function
 
+get_market_data()
 # get_market_data(expand_descriptions())
 
 
