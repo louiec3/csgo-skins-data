@@ -1,0 +1,35 @@
+weapon,quality,count,weapon,quality,count,weapon,quality,count,weapon,quality,count,weapon,quality,count,weapon,quality,count
+AK-47,Covert,16,AK-47,Classified,11,Desert Eagle,Restricted,12,Tec-9,Mil-Spec Grade,16,M4A4,Industrial Grade,6,PP-Bizon,Consumer Grade,9
+AWP,Covert,12,M4A1-S,Classified,10,MAC-10,Restricted,12,MAC-10,Mil-Spec Grade,14,P250,Industrial Grade,6,Nova,Consumer Grade,8
+M4A4,Covert,11,AWP,Classified,9,Glock-18,Restricted,11,P90,Mil-Spec Grade,14,Desert Eagle,Industrial Grade,5,AUG,Consumer Grade,7
+M4A1-S,Covert,9,P250,Classified,7,P250,Restricted,11,CZ75-Auto,Mil-Spec Grade,13,Glock-18,Industrial Grade,5,MP7,Consumer Grade,7
+Desert Eagle,Covert,4,P90,Classified,7,Dual Berettas,Restricted,9,Galil AR,Mil-Spec Grade,13,MAC-10,Industrial Grade,5,P250,Consumer Grade,7
+Glock-18,Covert,4,USP-S,Classified,7,Galil AR,Restricted,9,Glock-18,Mil-Spec Grade,13,MP7,Industrial Grade,5,Sawed-Off,Consumer Grade,7
+USP-S,Covert,4,AUG,Classified,6,MAG-7,Restricted,9,P250,Mil-Spec Grade,13,P2000,Industrial Grade,5,Dual Berettas,Consumer Grade,6
+AUG,Covert,2,Desert Eagle,Classified,6,Nova,Restricted,9,UMP-45,Mil-Spec Grade,13,P90,Industrial Grade,5,G3SG1,Consumer Grade,6
+FAMAS,Covert,2,FAMAS,Classified,6,USP-S,Restricted,9,Dual Berettas,Mil-Spec Grade,12,PP-Bizon,Industrial Grade,5,MAC-10,Consumer Grade,6
+Five-SeveN,Covert,2,M4A4,Classified,6,AWP,Restricted,8,MP9,Mil-Spec Grade,12,UMP-45,Industrial Grade,5,MAG-7,Consumer Grade,6
+MAC-10,Covert,2,Five-SeveN,Classified,4,CZ75-Auto,Restricted,8,P2000,Mil-Spec Grade,12,AK-47,Industrial Grade,4,MP9,Consumer Grade,6
+P90,Covert,2,MAC-10,Classified,4,FAMAS,Restricted,8,Sawed-Off,Mil-Spec Grade,12,Dual Berettas,Industrial Grade,4,SG 553,Consumer Grade,6
+SSG 08,Covert,2,MP9,Classified,4,Five-SeveN,Restricted,8,AUG,Mil-Spec Grade,11,Five-SeveN,Industrial Grade,4,SSG 08,Consumer Grade,6
+CZ75-Auto,Covert,1,SCAR-20,Classified,4,UMP-45,Restricted,8,Five-SeveN,Mil-Spec Grade,11,G3SG1,Industrial Grade,4,Tec-9,Consumer Grade,6
+Galil AR,Covert,1,SG 553,Classified,4,XM1014,Restricted,8,G3SG1,Mil-Spec Grade,11,Galil AR,Industrial Grade,4,UMP-45,Consumer Grade,6
+MP7,Covert,1,SSG 08,Classified,4,AK-47,Restricted,7,MP7,Mil-Spec Grade,11,M249,Industrial Grade,4,XM1014,Consumer Grade,6
+MP9,Covert,1,XM1014,Classified,4,AUG,Restricted,7,Negev,Mil-Spec Grade,11,MAG-7,Industrial Grade,4,CZ75-Auto,Consumer Grade,5
+P2000,Covert,1,CZ75-Auto,Classified,3,M4A1-S,Restricted,7,Nova,Mil-Spec Grade,11,Negev,Industrial Grade,4,Five-SeveN,Consumer Grade,5
+P250,Covert,1,Dual Berettas,Classified,3,M4A4,Restricted,7,PP-Bizon,Mil-Spec Grade,11,Nova,Industrial Grade,4,M249,Consumer Grade,5
+PP-Bizon,Covert,1,Galil AR,Classified,3,MP9,Restricted,7,SCAR-20,Mil-Spec Grade,11,Tec-9,Industrial Grade,4,P90,Consumer Grade,5
+R8 Revolver,Covert,1,Glock-18,Classified,3,P2000,Restricted,7,SG 553,Mil-Spec Grade,11,USP-S,Industrial Grade,4,SCAR-20,Consumer Grade,5
+Sawed-Off,Covert,1,Nova,Classified,3,Tec-9,Restricted,7,SSG 08,Mil-Spec Grade,11,XM1014,Industrial Grade,4,FAMAS,Consumer Grade,4
+,,,P2000,Classified,3,MP7,Restricted,6,XM1014,Mil-Spec Grade,11,AUG,Industrial Grade,3,R8 Revolver,Consumer Grade,4
+,,,R8 Revolver,Classified,3,P90,Restricted,6,FAMAS,Mil-Spec Grade,10,Sawed-Off,Industrial Grade,3,Galil AR,Consumer Grade,3
+,,,Sawed-Off,Classified,3,PP-Bizon,Restricted,6,MAG-7,Mil-Spec Grade,10,SG 553,Industrial Grade,3,MP5-SD,Consumer Grade,2
+,,,Tec-9,Classified,3,SG 553,Restricted,6,USP-S,Mil-Spec Grade,10,SSG 08,Industrial Grade,3,Negev,Consumer Grade,2
+,,,UMP-45,Classified,3,G3SG1,Restricted,5,Desert Eagle,Mil-Spec Grade,8,AWP,Industrial Grade,2,,,
+,,,G3SG1,Classified,2,MP5-SD,Restricted,5,M249,Mil-Spec Grade,7,CZ75-Auto,Industrial Grade,2,,,
+,,,MAG-7,Classified,2,Sawed-Off,Restricted,5,R8 Revolver,Mil-Spec Grade,7,FAMAS,Industrial Grade,2,,,
+,,,MP5-SD,Classified,2,SSG 08,Restricted,5,M4A4,Mil-Spec Grade,6,M4A1-S,Industrial Grade,2,,,
+,,,MP7,Classified,2,M249,Restricted,4,MP5-SD,Mil-Spec Grade,5,MP9,Industrial Grade,2,,,
+,,,Negev,Classified,1,Negev,Restricted,4,AK-47,Mil-Spec Grade,4,R8 Revolver,Industrial Grade,2,,,
+,,,PP-Bizon,Classified,1,SCAR-20,Restricted,3,M4A1-S,Mil-Spec Grade,4,SCAR-20,Industrial Grade,2,,,
+,,,,,,R8 Revolver,Restricted,2,AWP,Mil-Spec Grade,3,MP5-SD,Industrial Grade,1,,,

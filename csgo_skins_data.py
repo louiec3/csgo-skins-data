@@ -4,6 +4,7 @@ import json
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import bar_chart_race as bcr
 
 from datetime import datetime
 import time
@@ -154,7 +155,7 @@ def expand_descriptions():
     df['condition'] = df['name'].str.extract(r'(?<=\()(.*?)(?=\))')
     df['weapon_type'] = df['type'].apply(lambda row: row.rsplit(' ', 1)[1])
     df['quality'] = (df['type'].apply(lambda row: row.rsplit(' ', 1)[0])
-                    .replace({'Souvenir ': '', 'StatTrak™ ': '', '★ ': ''}, regex=True)
+                    .replace({'Souvenir ': '', 'StatTrak™ ': '', '★ ': '', ' Sniper': ''}, regex=True)
                     )
     ## this lambda can probably be simplified... **
     df['category'] = df['name'].apply(lambda x: '★ StatTrak™' if '★' in x and 'StatTrak' in x else 'StatTrak™' if 'StatTrak' in x else '★' if '★' in x else 'Souvenir' if 'Souvenir' in x else 'Normal')
@@ -176,15 +177,29 @@ def expand_descriptions():
 
 def weapon_stats():
     df = pd.read_csv('AllWeapons3.csv')
+    df2 = df[['weapon', 'skin', 'condition', 'weapon_type', 'quality', 'category']]
+    df2 = df2[~df2['weapon_type'].str.contains('Knife')]
+    df_uniqueSkins = df2.drop_duplicates(subset=['weapon', 'skin'])
 
-    print(df.columns)
-    print(df.head(2))
-    countPerWeaponType = df.groupby(['weapon_type'])['weapon_type'].count().reset_index(name='count').reset_index(drop=True)
-    VolPerWeaponType_df = df.groupby(['weapon_type'])['sell_listings'].sum().reset_index(name='total_volume').reset_index(drop=True)
-    volPerWeaponTypeQuality_df = df.groupby(['weapon_type', 'quality'])['sell_listings'].sum().reset_index(name='total_volume').sort_values('total_volume').reset_index(drop=True)
-    print(countPerWeaponType)
-    print(VolPerWeaponType_df)
-    print(volPerWeaponTypeQuality_df)
+    df_skinsPerType = df_uniqueSkins.groupby(['weapon_type'])['skin'].count().reset_index(name='count')
+    print(df_skinsPerType)
+    print()
+    df_skinsPerWeapon = df_uniqueSkins.groupby(['weapon'])['skin'].count().reset_index(name='count').sort_values(by='count', ascending=True)
+    print(df_skinsPerWeapon)
+    print()
+    df_skinsPerQuality = df_uniqueSkins.groupby(['quality'])['skin'].count().reset_index(name='count').sort_values(by='count', ascending=True)
+    print(df_skinsPerQuality)
+    print()
+    df_weaponTypePerSkinQuality = df_uniqueSkins.groupby(['weapon_type', 'quality'])['skin'].count().reset_index(name='count').sort_values(by='count', ascending=True)
+    print(df_weaponTypePerSkinQuality)
+    print()
+    df_weaponsPerSkinQuality = df_uniqueSkins.groupby(['weapon', 'quality'])['skin'].count().reset_index(name='count').sort_values(by='count', ascending=True)
+    print(df_weaponsPerSkinQuality) ## Pivot: index as date, columns as weapon-skin
+    print()
+    # df_weaponsPerSkinQuality.to_csv('weapons_by_quality.csv', index=False)
+
+    quit()
+
     # weaponSkinDistribution_df.plot(x='weapon_type', y='count', kind='bar')
     # plt.show()
 
@@ -204,7 +219,7 @@ def weapon_stats():
     # plt.show()
 
 
-# weapon_stats()
+weapon_stats()
 # weapon_stats(expand_descriptions())
 
 
@@ -300,28 +315,51 @@ def get_market_data():
 
 
 def reformat_market_table():
+    ## the direction of this function was side-tracked to market volume...  use as refernce but ditching for now...
     ## sort_values and sort_index did not sort date column correctly. Resorted to list.sort()
     priceHistory_df = pd.read_csv('pricehistory.csv')
-    # priceHistory_df['date'] = pd.to_datetime(priceHistory_df['date']).drop_duplicates(keep='last').dropna()
-    reformat = priceHistory_df['date'].astype('datetime64[ns]').drop_duplicates(keep='last')
-
-    test_list = list(set(reformat.tolist()))
-    test_list.sort()
-    test1 = pd.DataFrame(test_list, columns=['date'])
-    # test1 = priceHistory_df['date'].drop_duplicates(keep='last').sort_index(ascending=True) #.reset_index(drop=True)
-    # test1 = priceHistory_df['date'].drop_duplicates(keep='last').sort_values() #.reset_index(drop=True)
-    # print(test1.dtypes)
-    # print(test_list)
-    print(test1)
-    test1.to_csv('ordereddates.csv', index=False)
-
-    # pivottest_df = priceHistory_df.pivot_table(values='volume', index='date', columns=['weapon', 'skin'])
-    # print(pivottest_df)
-    quit()
-
-    volumePivot_df = priceHistory_df.pivot(index=['weapon', 'skin'], columns='date', values='volume')
-    pricePivot_df = priceHistory_df.pivot(index=['weapon', 'skin'], columns='date', values='price')
-    print(volumePivot_df)
-    print(pricePivot_df)
     
-reformat_market_table()
+
+    # # Start **was this step even neccessarry? YES this was because sort_index was not working!!! well... 
+    # # now it looks like the problem fixes itself when the pivot table is created...
+    # # priceHistory_df['date'] = pd.to_datetime(priceHistory_df['date']).drop_duplicates(keep='last').dropna()
+    # priceHistory_df['date'] = priceHistory_df['date'].astype('datetime64[ns]') #.drop_duplicates(keep='last').dropna()
+    # reformat = priceHistory_df['date'] #.astype('datetime64[ns]').drop_duplicates(keep='last')
+
+    # test_list = list(set(reformat.tolist()))
+    # test_list.sort()
+    # test1 = pd.DataFrame(test_list, columns=['date'])
+    # corrected_format_df = pd.merge(test1, priceHistory_df, on='date')
+    # print(corrected_format_df)
+
+
+    # pivottest_df1 = corrected_format_df.pivot_table(index='date', columns=['weapon', 'skin'], values='volume').fillna(0)
+    # print(pivottest_df1)
+    # pivottest_df1.to_csv('test1.csv')
+    # # End
+    
+
+    print(priceHistory_df)
+    volumeBySkinPivot_df = priceHistory_df.pivot_table(index='date', columns=['weapon', 'skin'], values='volume').fillna(0)
+    # volumeBySkinPivot_df.to_csv('test2.csv')
+    print(volumeBySkinPivot_df)
+    volumeBySkinPivot_df = volumeBySkinPivot_df.cumsum(axis=1).sort_index(level=0)
+    print(volumeBySkinPivot_df)
+    volumeBySkinPivot_df.to_csv('test3.csv')
+    quit()
+    # quit()
+
+    ## these pivots can be deleted
+    # volumePivot_df = priceHistory_df.pivot(index=['weapon', 'skin'], columns='date', values='volume')
+    # pricePivot_df = priceHistory_df.pivot(index=['weapon', 'skin'], columns='date', values='price')
+    # print(volumePivot_df)
+    # print(pricePivot_df)
+
+    # bcr.bar_chart_race(
+    #     df = volumeBySkinPivot_df,
+    #     filename='barchart1.mp4'
+    # )
+    print()
+
+# reformat_market_table()
+
