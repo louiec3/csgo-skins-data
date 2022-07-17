@@ -8,6 +8,7 @@ After a summmer internship working with pandas and creating automation tools, I 
 Do the rifles have an equal distribution of weapon skins?
 
 **Why this dataset? (*include more background and reword):**
+
 Counter-Strike: Global Offensive (CS:GO) has been a game I have played since 2014 and has had a large involvement in my life. The strategic, first person shooter (FPS) game with the purpose of outsmarting your enemies in a coopertive 5v5 fuels the adrenaline in my friends and I to continue playing this game in 2022. This game has an enourmous following, consistently reaching over 500 thousand active players daily in 2022. The best teams in the world compete often in tournements that keep us gamers engaged. 
 While the main focus of this game is indeed the gameplay, the developers at Valve created a new dimension to the game: a tradeable market of in-game items. Valve was the first company to introduce purchasable in-game cosmetics (--fact check) and at it, created a new economy similar to the stock market. A stock market of CSGO weapon skins... case openings... changing volume and price value... 
 This economy known as the Steam Marketplace is what this project focuses on; the distribution of weapon skins, their rarity, and how these prices align with these factors.
