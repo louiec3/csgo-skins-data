@@ -24,4 +24,5 @@ This project aims to analyze and visualize certain aspects of this market and ho
 - As of 7/17/2022
 - Data is based solely off of the steam market
 - Release date is based off of first occurance on market. Not definitive release of skin.
-- Some skins may not have been sold on the steam market ever resulting in an incomplete dataset (to be confirmed...)
+- Skins that do not have active listings are not included in this summary resulting in an incomplete dataset
+  - This is due to the extreme rarity of certain skins (ie AWP Medusa or the M4A4 Howl, which is contraband)
